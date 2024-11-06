@@ -26,13 +26,16 @@ jobs:
             exit 1
           fi
 
-      - name: Convert binary plist to XML
+      - name: Convert binary plist to XML using Python
         run: |
-          if [ -f com.apple.UIKit.plist ]; then
-            plutil -convert xml1 com.apple.UIKit.plist
-            echo "Converted plist file contents:"
-            cat com.apple.UIKit.plist
-          else
-            echo "The plist file does not exist."
-            exit 1
-          fi
+          echo "Reading binary plist using Python..."
+          python3 -c "
+import plistlib
+
+try:
+    with open('com.apple.UIKit.plist', 'rb') as f:
+        plist_data = plistlib.load(f)
+        print(plist_data)
+except Exception as e:
+    print(f'Error reading plist: {e}')
+"
