@@ -31,11 +31,13 @@ jobs:
           echo "Reading binary plist using Python..."
           python3 -c "
 import plistlib
+import sys
 
 try:
     with open('com.apple.UIKit.plist', 'rb') as f:
         plist_data = plistlib.load(f)
         print(plist_data)
 except Exception as e:
-    print(f'Error reading plist: {e}')
+    print(f'Error reading plist: {e}', file=sys.stderr)
+    sys.exit(1)
 "
