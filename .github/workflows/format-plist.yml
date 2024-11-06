@@ -19,16 +19,20 @@ jobs:
       - name: Check original plist file
         run: |
           echo "Original plist file contents:"
-          cat com.apple.UIKit.plist
-          plutil -lint com.apple.UIKit.plist
+          if [ -f com.apple.UIKit.plist ]; then
+            plutil -convert xml1 -o - com.apple.UIKit.plist
+          else
+            echo "The plist file does not exist."
+            exit 1
+          fi
 
-      - name: Make plist file human-readable
+      - name: Convert binary plist to XML
         run: |
-          if [ -s com.apple.UIKit.plist ]; then
+          if [ -f com.apple.UIKit.plist ]; then
             plutil -convert xml1 com.apple.UIKit.plist
             echo "Converted plist file contents:"
             cat com.apple.UIKit.plist
           else
-            echo "The plist file is empty or does not exist."
+            echo "The plist file does not exist."
             exit 1
           fi
