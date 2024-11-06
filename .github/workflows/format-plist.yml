@@ -1,0 +1,22 @@
+name: Format plist file
+
+on:
+  push:
+    branches:
+      - main  # Change this to your default branch if necessary
+  pull_request:
+    branches:
+      - main  # Change this to your default branch if necessary
+
+jobs:
+  format-plist:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Make plist file human-readable
+        run: |
+          plutil -convert xml1 com.apple.UIKit.plist
+          cat com.apple.UIKit.plist
