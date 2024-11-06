@@ -16,7 +16,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Check original plist file
+        run: |
+          echo "Original plist file contents:"
+          cat com.apple.UIKit.plist
+
       - name: Make plist file human-readable
         run: |
-          plutil -convert xml1 com.apple.UIKit.plist
-          cat com.apple.UIKit.plist
+          if [ -s com.apple.UIKit.plist ]; then
+            plutil -convert xml1 com.apple.UIKit.plist
+            echo "Converted plist file contents:"
+            cat com.apple.UIKit.plist
+          else
+            echo "The plist file is empty or does not exist."
+            exit 1
+          fi
