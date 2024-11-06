@@ -20,6 +20,7 @@ jobs:
         run: |
           echo "Original plist file contents:"
           cat com.apple.UIKit.plist
+          plutil -lint com.apple.UIKit.plist
 
       - name: Make plist file human-readable
         run: |
