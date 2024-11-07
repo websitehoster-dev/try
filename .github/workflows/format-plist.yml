@@ -1,43 +1,43 @@
-name: Format plist file
+name: Modify Plist File
 
 on:
   push:
     branches:
-      - main  # Change this to your default branch if necessary
-  pull_request:
-    branches:
-      - main  # Change this to your default branch if necessary
+      - main
 
 jobs:
-  format-plist:
+  modify-plist:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Check out repository
+      uses: actions/checkout@v2
 
-      - name: Check original plist file
-        run: |
-          echo "Original plist file contents:"
-          if [ -f com.apple.UIKit.plist ]; then
-            plutil -convert xml1 -o - com.apple.UIKit.plist
-          else
-            echo "The plist file does not exist."
-            exit 1
-          fi
+    - name: Install tools
+      run: |
+        brew install libimobiledevice
+        brew install xmlstarlet
 
-      - name: Execute Python code
-        run: |
-          echo "Executing Python code..."
-          python3 - << 'EOF'
-import plistlib
-import sys
+    - name: Convert plist to XML
+      run: |
+        plutil -convert xml1 ./com.apple.UIKit.plist
 
-try:
-    with open('com.apple.UIKit.plist', 'rb') as f:
-        plist_data = plistlib.load(f)
-        print(plist_data)
-except Exception as e:
-    print(f'Error reading plist: {e}', file=sys.stderr)
-    sys.exit(1)
-EOF
+    - name: Add line to XML
+      run: |
+        xmlstarlet ed --inplace -s '/plist/dict' -t elem -n key -v 'UIStatusBarVisualProviderClassName' \
+          -s '/plist/dict/key[text()="UIStatusBarVisualProviderClassName"]' -t elem -n string -v '_UIStatusBarVisualProvider_Split1170' \
+          ./com.apple.UIKit.plist
+
+    - name: Convert XML back to binary plist
+      run: |
+        plutil -convert binary1 ./com.apple.UIKit.plist
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.email "lardxbox2006@gmail.com"
+        git config --global user.name "websitehoster-dev"
+        git add ./com.apple.UIKit.plist
+        git commit -m "Modify UIStatusBarVisualProviderClassName in com.apple.UIKit.plist"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
