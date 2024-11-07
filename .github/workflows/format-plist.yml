@@ -40,4 +40,4 @@ jobs:
         git commit -m "Modify UIStatusBarVisualProviderClassName in com.apple.UIKit.plist"
         git push
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
