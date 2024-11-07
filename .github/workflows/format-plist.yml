@@ -1,4 +1,4 @@
-name: Modify Plist File
+name: Convert XML to Binary Plist
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  modify-plist:
+  convert-plist:
     runs-on: macos-latest
 
     steps:
@@ -15,24 +15,18 @@ jobs:
 
     - name: Install tools
       run: |
-        brew install xmlstarlet
+        brew install libimobiledevice
 
-    - name: Convert plist to XML
+    - name: Convert XML to Binary Plist
       run: |
-        plutil -convert xml1 ./com.apple.UIKit.plist -o ./com.apple.UIKit.plist.xml
-
-    - name: Add line to XML
-      run: |
-        xmlstarlet ed --inplace -s '/plist/dict' -t elem -n key -v 'UIStatusBarVisualProviderClassName' \
-          -s '/plist/dict/key[text()="UIStatusBarVisualProviderClassName"]' -t elem -n string -v '_UIStatusBarVisualProvider_Split1170' \
-          ./com.apple.UIKit.plist.xml
+        plutil -convert binary1 ./com.apple.UIKit.plist.xml -o ./com.apple.UI2Kit.plist
 
     - name: Commit and push changes
       run: |
         git config --global user.email "lardxbox2006@gmail.com"
         git config --global user.name "websitehoster-dev"
-        git add ./com.apple.UIKit.plist.xml
-        git commit -m "Modify UIStatusBarVisualProviderClassName in com.apple.UIKit.plist.xml"
+        git add ./com.apple.UI2Kit.plist
+        git commit -m "Convert XML to Binary Plist"
         git push
       env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
