@@ -15,33 +15,24 @@ jobs:
 
     - name: Install tools
       run: |
-        brew install libimobiledevice
         brew install xmlstarlet
 
     - name: Convert plist to XML
       run: |
-        plutil -convert xml1 ./com.apple.UIKit.plist
-
-    - name: Validate XML
-      run: |
-        plutil -lint ./com.apple.UIKit.plist
+        plutil -convert xml1 ./com.apple.UIKit.plist -o ./com.apple.UIKit.plist.xml
 
     - name: Add line to XML
       run: |
         xmlstarlet ed --inplace -s '/plist/dict' -t elem -n key -v 'UIStatusBarVisualProviderClassName' \
           -s '/plist/dict/key[text()="UIStatusBarVisualProviderClassName"]' -t elem -n string -v '_UIStatusBarVisualProvider_Split1170' \
-          ./com.apple.UIKit.plist
-
-    - name: Convert XML back to binary plist
-      run: |
-        plutil -convert binary1 ./com.apple.UIKit.plist
+          ./com.apple.UIKit.plist.xml
 
     - name: Commit and push changes
       run: |
         git config --global user.email "lardxbox2006@gmail.com"
         git config --global user.name "websitehoster-dev"
-        git add ./com.apple.UIKit.plist
-        git commit -m "Modify UIStatusBarVisualProviderClassName in com.apple.UIKit.plist"
+        git add ./com.apple.UIKit.plist.xml
+        git commit -m "Modify UIStatusBarVisualProviderClassName in com.apple.UIKit.plist.xml"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
